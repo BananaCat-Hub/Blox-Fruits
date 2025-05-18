@@ -1,4 +1,4 @@
--- Blox Fruits Spawner with Real Fruits
+-- Blox Fruits Spawner with Real Fruits - FIXED VERSION
 local player = game:GetService("Players").LocalPlayer
 local gui = Instance.new("ScreenGui")
 gui.Name = "RealFruitSpawner"
@@ -7,7 +7,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 -- Main frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 400)
-frame.Position = UDim2.new(0.5, -175, 0.5, -200)
+frame.Position = UDim2.new(0.5, -175, 0.5, -100)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
 frame.Active = true
@@ -38,11 +38,12 @@ searchBox.Parent = frame
 
 -- Scrolling frame for fruits list
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(0.9, 0, 0, 250)
+scrollFrame.Size = UDim2.new(0.9, 0, 0, 300)
 scrollFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
 scrollFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 5
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 scrollFrame.Parent = frame
 
 -- Close button
@@ -56,53 +57,75 @@ closeButton.Font = Enum.Font.GothamBold
 closeButton.TextSize = 14
 closeButton.Parent = frame
 
--- List of all fruits with their IDs (simplified for example)
+-- List of all fruits with their IDs and rarities
 local allFruits = {
     {Name = "Bomb", ID = 1, Rarity = "Common"},
     {Name = "Spike", ID = 2, Rarity = "Common"},
     {Name = "Chop", ID = 3, Rarity = "Common"},
     {Name = "Spring", ID = 4, Rarity = "Common"},
-    {Name = "Flame", ID = 5, Rarity = "Uncommon"},
-    {Name = "Ice", ID = 6, Rarity = "Uncommon"},
-    {Name = "Sand", ID = 7, Rarity = "Uncommon"},
-    {Name = "Dark", ID = 8, Rarity = "Uncommon"},
-    {Name = "Diamond", ID = 9, Rarity = "Uncommon"},
-    {Name = "Light", ID = 10, Rarity = "Rare"},
-    {Name = "Rubber", ID = 11, Rarity = "Rare"},
-    {Name = "Barrier", ID = 12, Rarity = "Rare"},
-    {Name = "Magma", ID = 13, Rarity = "Rare"},
-    {Name = "Quake", ID = 14, Rarity = "Legendary"},
-    {Name = "Buddha", ID = 15, Rarity = "Legendary"},
-    {Name = "Love", ID = 16, Rarity = "Legendary"},
-    {Name = "Spider", ID = 17, Rarity = "Legendary"},
-    {Name = "Sound", ID = 18, Rarity = "Legendary"},
-    {Name = "Phoenix", ID = 19, Rarity = "Mythical"},
-    {Name = "Portal", ID = 20, Rarity = "Mythical"},
-    {Name = "Rumble", ID = 21, Rarity = "Mythical"},
-    {Name = "Paw", ID = 22, Rarity = "Mythical"},
-    {Name = "Gravity", ID = 23, Rarity = "Mythical"},
-    {Name = "Dough", ID = 24, Rarity = "Mythical"},
-    {Name = "Shadow", ID = 25, Rarity = "Mythical"},
-    {Name = "Venom", ID = 26, Rarity = "Mythical"},
-    {Name = "Control", ID = 27, Rarity = "Mythical"},
-    {Name = "Spirit", ID = 28, Rarity = "Mythical"},
-    {Name = "Dragon", ID = 29, Rarity = "Mythical"},
-    {Name = "Leopard", ID = 30, Rarity = "Mythical"},
-    {Name = "Kitsune", ID = 31, Rarity = "Mythical"},
-    {Name = "Mammoth", ID = 32, Rarity = "Mythical"},
-    {Name = "T-Rex", ID = 33, Rarity = "Mythical"},
-    {Name = "Dough Awakened", ID = 34, Rarity = "Mythical"},
-    {Name = "Shadow Awakened", ID = 35, Rarity = "Mythical"},
-    {Name = "Venom Awakened", ID = 36, Rarity = "Mythical"},
-    {Name = "Control Awakened", ID = 37, Rarity = "Mythical"},
-    {Name = "Spirit Awakened", ID = 38, Rarity = "Mythical"},
-    {Name = "Dragon Awakened", ID = 39, Rarity = "Mythical"},
-    {Name = "Dragon Red", ID = 40, Rarity = "Mythical"},
-    {Name = "Dragon Blue", ID = 41, Rarity = "Mythical"},
-    {Name = "Dragon Green", ID = 42, Rarity = "Mythical"},
-    {Name = "Dragon West", ID = 43, Rarity = "Mythical"},
-    {Name = "Dragon East", ID = 44, Rarity = "Mythical"},
+    {Name = "Kilo", ID = 5, Rarity = "Common"},
+    {Name = "Smoke", ID = 6, Rarity = "Common"},
+    {Name = "Spin", ID = 7, Rarity = "Common"},
+    {Name = "Flame", ID = 8, Rarity = "Uncommon"},
+    {Name = "Falcon", ID = 9, Rarity = "Uncommon"},
+    {Name = "Ice", ID = 10, Rarity = "Uncommon"},
+    {Name = "Sand", ID = 11, Rarity = "Uncommon"},
+    {Name = "Dark", ID = 12, Rarity = "Uncommon"},
+    {Name = "Diamond", ID = 13, Rarity = "Uncommon"},
+    {Name = "Light", ID = 14, Rarity = "Rare"},
+    {Name = "Rubber", ID = 15, Rarity = "Rare"},
+    {Name = "Barrier", ID = 16, Rarity = "Rare"},
+    {Name = "Ghost", ID = 17, Rarity = "Rare"},
+    {Name = "Magma", ID = 18, Rarity = "Rare"},
+    {Name = "Quake", ID = 19, Rarity = "Legendary"},
+    {Name = "Buddha", ID = 20, Rarity = "Legendary"},
+    {Name = "Love", ID = 21, Rarity = "Legendary"},
+    {Name = "Spider", ID = 22, Rarity = "Legendary"},
+    {Name = "Sound", ID = 23, Rarity = "Legendary"},
+    {Name = "Phoenix", ID = 24, Rarity = "Mythical"},
+    {Name = "Portal", ID = 25, Rarity = "Mythical"},
+    {Name = "Rumble", ID = 26, Rarity = "Mythical"},
+    {Name = "Paw", ID = 27, Rarity = "Mythical"},
+    {Name = "Gravity", ID = 28, Rarity = "Mythical"},
+    {Name = "Dough", ID = 29, Rarity = "Mythical"},
+    {Name = "Shadow", ID = 30, Rarity = "Mythical"},
+    {Name = "Venom", ID = 31, Rarity = "Mythical"},
+    {Name = "Control", ID = 32, Rarity = "Mythical"},
+    {Name = "Spirit", ID = 33, Rarity = "Mythical"},
+    {Name = "Dragon", ID = 34, Rarity = "Mythical"},
+    {Name = "Leopard", ID = 35, Rarity = "Mythical"},
+    {Name = "Kitsune", ID = 36, Rarity = "Mythical"},
+    {Name = "Mammoth", ID = 37, Rarity = "Mythical"},
+    {Name = "T-Rex", ID = 38, Rarity = "Mythical"},
+    {Name = "Dough Awakened", ID = 39, Rarity = "Mythical"},
+    {Name = "Shadow Awakened", ID = 40, Rarity = "Mythical"},
+    {Name = "Venom Awakened", ID = 41, Rarity = "Mythical"},
+    {Name = "Control Awakened", ID = 42, Rarity = "Mythical"},
+    {Name = "Spirit Awakened", ID = 43, Rarity = "Mythical"},
+    {Name = "Dragon Awakened", ID = 44, Rarity = "Mythical"},
+    {Name = "Dragon Red", ID = 45, Rarity = "Mythical"},
+    {Name = "Dragon Blue", ID = 46, Rarity = "Mythical"},
+    {Name = "Dragon Green", ID = 47, Rarity = "Mythical"},
+    {Name = "Dragon West", ID = 48, Rarity = "Mythical"},
+    {Name = "Dragon East", ID = 49, Rarity = "Mythical"},
 }
+
+-- Function to get color based on rarity
+local function getRarityColor(rarity)
+    if rarity == "Common" then
+        return Color3.fromRGB(150, 150, 150)
+    elseif rarity == "Uncommon" then
+        return Color3.fromRGB(50, 200, 50)
+    elseif rarity == "Rare" then
+        return Color3.fromRGB(50, 150, 255)
+    elseif rarity == "Legendary" then
+        return Color3.fromRGB(200, 50, 255)
+    elseif rarity == "Mythical" then
+        return Color3.fromRGB(255, 150, 50)
+    else
+        return Color3.fromRGB(100, 100, 100)
+    end
+end
 
 -- Function to create fruit buttons
 local function createFruitButtons(filter)
@@ -138,23 +161,6 @@ local function createFruitButtons(filter)
     scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
 end
 
--- Function to get color based on rarity
-local function getRarityColor(rarity)
-    if rarity == "Common" then
-        return Color3.fromRGB(150, 150, 150)
-    elseif rarity == "Uncommon" then
-        return Color3.fromRGB(50, 200, 50)
-    elseif rarity == "Rare" then
-        return Color3.fromRGB(50, 150, 255)
-    elseif rarity == "Legendary" then
-        return Color3.fromRGB(200, 50, 255)
-    elseif rarity == "Mythical" then
-        return Color3.fromRGB(255, 150, 50)
-    else
-        return Color3.fromRGB(100, 100, 100)
-    end
-end
-
 -- Function to give fruit to player
 local function giveFruitToPlayer(fruitId, fruitName)
     -- Check if player has a backpack
@@ -175,11 +181,11 @@ local function giveFruitToPlayer(fruitId, fruitName)
         -- Simplified fruit script
         local tool = script.Parent
         local player = game:GetService("Players").LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
         
         tool.Activated:Connect(function()
             print("Using ]] .. fruitName .. [[ fruit!")
-            -- Actual game would have more complex logic here
+            -- Add actual fruit effects here
         end)
         
         tool.Equipped:Connect(function()
@@ -201,21 +207,16 @@ local function giveFruitToPlayer(fruitId, fruitName)
     handle.Material = Enum.Material.Neon
     handle.Parent = tool
     
-    -- Add fruit model (simplified)
-    local model = Instance.new("Model")
-    model.Name = fruitName .. "Model"
-    model.Parent = tool
-    
     -- Notification
     local notification = Instance.new("ScreenGui")
     notification.Name = "FruitNotification"
     notification.Parent = player.PlayerGui
     
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 200, 0, 50)
-    frame.Position = UDim2.new(0.5, -100, 0.8, 0)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    frame.Parent = notification
+    local notifFrame = Instance.new("Frame")
+    notifFrame.Size = UDim2.new(0, 200, 0, 50)
+    notifFrame.Position = UDim2.new(0.5, -100, 0.8, 0)
+    notifFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    notifFrame.Parent = notification
     
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
@@ -224,7 +225,7 @@ local function giveFruitToPlayer(fruitId, fruitName)
     label.TextColor3 = Color3.new(1, 1, 1)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 16
-    label.Parent = frame
+    label.Parent = notifFrame
     
     -- Remove notification after 3 seconds
     game:GetService("Debris"):AddItem(notification, 3)
@@ -240,5 +241,5 @@ closeButton.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- Initial creation of buttons
+-- Initialize the fruit buttons
 createFruitButtons()
