@@ -1,245 +1,144 @@
--- Blox Fruits Spawner with Real Fruits - FIXED VERSION
-local player = game:GetService("Players").LocalPlayer
-local gui = Instance.new("ScreenGui")
-gui.Name = "RealFruitSpawner"
-gui.Parent = player:WaitForChild("PlayerGui")
+-- Blox Fruits Devil Fruit Picker GUI
+-- Paste this in a LocalScript inside StarterGui or a ScreenGui
 
--- Main frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 400)
-frame.Position = UDim2.new(0.5, -175, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
 
--- Title
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Text = "Blox Fruits Spawner"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.Parent = frame
+-- Create the main GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DevilFruitPicker"
+ScreenGui.Parent = Player.PlayerGui
 
--- Search box
-local searchBox = Instance.new("TextBox")
-searchBox.Size = UDim2.new(0.9, 0, 0, 30)
-searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
-searchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-searchBox.TextColor3 = Color3.new(1, 1, 1)
-searchBox.PlaceholderText = "Search fruits..."
-searchBox.Font = Enum.Font.Gotham
-searchBox.TextSize = 14
-searchBox.Parent = frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
 
--- Scrolling frame for fruits list
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(0.9, 0, 0, 300)
-scrollFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
-scrollFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-scrollFrame.BorderSizePixel = 0
-scrollFrame.ScrollBarThickness = 5
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollFrame.Parent = frame
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Text = "Devil Fruit Picker"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.Parent = MainFrame
 
--- Close button
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 20, 0, 20)
-closeButton.Position = UDim2.new(1, -20, 0, 0)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Text = "X"
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextSize = 14
-closeButton.Parent = frame
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 18
+CloseButton.Parent = MainFrame
 
--- List of all fruits with their IDs and rarities
-local allFruits = {
-    {Name = "Bomb", ID = 1, Rarity = "Common"},
-    {Name = "Spike", ID = 2, Rarity = "Common"},
-    {Name = "Chop", ID = 3, Rarity = "Common"},
-    {Name = "Spring", ID = 4, Rarity = "Common"},
-    {Name = "Kilo", ID = 5, Rarity = "Common"},
-    {Name = "Smoke", ID = 6, Rarity = "Common"},
-    {Name = "Spin", ID = 7, Rarity = "Common"},
-    {Name = "Flame", ID = 8, Rarity = "Uncommon"},
-    {Name = "Falcon", ID = 9, Rarity = "Uncommon"},
-    {Name = "Ice", ID = 10, Rarity = "Uncommon"},
-    {Name = "Sand", ID = 11, Rarity = "Uncommon"},
-    {Name = "Dark", ID = 12, Rarity = "Uncommon"},
-    {Name = "Diamond", ID = 13, Rarity = "Uncommon"},
-    {Name = "Light", ID = 14, Rarity = "Rare"},
-    {Name = "Rubber", ID = 15, Rarity = "Rare"},
-    {Name = "Barrier", ID = 16, Rarity = "Rare"},
-    {Name = "Ghost", ID = 17, Rarity = "Rare"},
-    {Name = "Magma", ID = 18, Rarity = "Rare"},
-    {Name = "Quake", ID = 19, Rarity = "Legendary"},
-    {Name = "Buddha", ID = 20, Rarity = "Legendary"},
-    {Name = "Love", ID = 21, Rarity = "Legendary"},
-    {Name = "Spider", ID = 22, Rarity = "Legendary"},
-    {Name = "Sound", ID = 23, Rarity = "Legendary"},
-    {Name = "Phoenix", ID = 24, Rarity = "Mythical"},
-    {Name = "Portal", ID = 25, Rarity = "Mythical"},
-    {Name = "Rumble", ID = 26, Rarity = "Mythical"},
-    {Name = "Paw", ID = 27, Rarity = "Mythical"},
-    {Name = "Gravity", ID = 28, Rarity = "Mythical"},
-    {Name = "Dough", ID = 29, Rarity = "Mythical"},
-    {Name = "Shadow", ID = 30, Rarity = "Mythical"},
-    {Name = "Venom", ID = 31, Rarity = "Mythical"},
-    {Name = "Control", ID = 32, Rarity = "Mythical"},
-    {Name = "Spirit", ID = 33, Rarity = "Mythical"},
-    {Name = "Dragon", ID = 34, Rarity = "Mythical"},
-    {Name = "Leopard", ID = 35, Rarity = "Mythical"},
-    {Name = "Kitsune", ID = 36, Rarity = "Mythical"},
-    {Name = "Mammoth", ID = 37, Rarity = "Mythical"},
-    {Name = "T-Rex", ID = 38, Rarity = "Mythical"},
-    {Name = "Dough Awakened", ID = 39, Rarity = "Mythical"},
-    {Name = "Shadow Awakened", ID = 40, Rarity = "Mythical"},
-    {Name = "Venom Awakened", ID = 41, Rarity = "Mythical"},
-    {Name = "Control Awakened", ID = 42, Rarity = "Mythical"},
-    {Name = "Spirit Awakened", ID = 43, Rarity = "Mythical"},
-    {Name = "Dragon Awakened", ID = 44, Rarity = "Mythical"},
-    {Name = "Dragon Red", ID = 45, Rarity = "Mythical"},
-    {Name = "Dragon Blue", ID = 46, Rarity = "Mythical"},
-    {Name = "Dragon Green", ID = 47, Rarity = "Mythical"},
-    {Name = "Dragon West", ID = 48, Rarity = "Mythical"},
-    {Name = "Dragon East", ID = 49, Rarity = "Mythical"},
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+local SearchBox = Instance.new("TextBox")
+SearchBox.Name = "SearchBox"
+SearchBox.PlaceholderText = "Search fruits..."
+SearchBox.Size = UDim2.new(1, -20, 0, 30)
+SearchBox.Position = UDim2.new(0, 10, 0, 35)
+SearchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.TextSize = 14
+SearchBox.Parent = MainFrame
+
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Name = "ScrollFrame"
+ScrollFrame.Size = UDim2.new(1, -10, 1, -75)
+ScrollFrame.Position = UDim2.new(0, 5, 0, 70)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.ScrollBarThickness = 5
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.Parent = MainFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Parent = ScrollFrame
+
+-- List of all Blox Fruits devil fruits (including variants like Dragon West/East)
+local devilFruits = {
+    "Bomb", "Spike", "Chop", "Spring", "Rocket", "Spin", "Bird: Falcon", "Smoke", "Flame", 
+    "Ice", "Sand", "Dark", "Diamond", "Light", "Rubber", "Barrier", "Ghost", "Magma", 
+    "Quake", "Buddha", "Love", "Spider", "Sound", "Phoenix", "Portal", "Rumble", "Pain", 
+    "Blizzard", "Gravity", "Mammoth", "Dough", "Shadow", "Venom", "Control", "Spirit",
+    "Dragon West", "Dragon East", "Leopard", "Kitsune"
 }
 
--- Function to get color based on rarity
-local function getRarityColor(rarity)
-    if rarity == "Common" then
-        return Color3.fromRGB(150, 150, 150)
-    elseif rarity == "Uncommon" then
-        return Color3.fromRGB(50, 200, 50)
-    elseif rarity == "Rare" then
-        return Color3.fromRGB(50, 150, 255)
-    elseif rarity == "Legendary" then
-        return Color3.fromRGB(200, 50, 255)
-    elseif rarity == "Mythical" then
-        return Color3.fromRGB(255, 150, 50)
-    else
-        return Color3.fromRGB(100, 100, 100)
-    end
-end
-
--- Function to create fruit buttons
-local function createFruitButtons(filter)
+-- Create buttons for each fruit
+local function createFruitButtons()
     -- Clear existing buttons
-    for _, child in ipairs(scrollFrame:GetChildren()) do
+    for _, child in ipairs(ScrollFrame:GetChildren()) do
         if child:IsA("TextButton") then
             child:Destroy()
         end
     end
-
-    -- Create new buttons based on filter
-    local yOffset = 5
-    for _, fruit in ipairs(allFruits) do
-        if not filter or string.find(string.lower(fruit.Name), string.lower(filter)) then
-            local button = Instance.new("TextButton")
-            button.Size = UDim2.new(0.95, 0, 0, 30)
-            button.Position = UDim2.new(0.025, 0, 0, yOffset)
-            button.BackgroundColor3 = getRarityColor(fruit.Rarity)
-            button.TextColor3 = Color3.new(1, 1, 1)
-            button.Text = fruit.Name
-            button.Font = Enum.Font.Gotham
-            button.TextSize = 14
-            button.Parent = scrollFrame
-            
-            button.MouseButton1Click:Connect(function()
-                giveFruitToPlayer(fruit.ID, fruit.Name)
-            end)
-            
-            yOffset = yOffset + 35
+    
+    -- Filter fruits based on search
+    local searchText = string.lower(SearchBox.Text)
+    local filteredFruits = {}
+    
+    for _, fruit in ipairs(devilFruits) do
+        if string.find(string.lower(fruit), searchText, 1, true) then
+            table.insert(filteredFruits, fruit)
         end
     end
     
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
-end
-
--- Function to give fruit to player
-local function giveFruitToPlayer(fruitId, fruitName)
-    -- Check if player has a backpack
-    if not player:FindFirstChild("Backpack") then
-        warn("Player backpack not found!")
-        return
+    -- Create buttons for filtered fruits
+    for _, fruit in ipairs(filteredFruits) do
+        local FruitButton = Instance.new("TextButton")
+        FruitButton.Name = fruit
+        FruitButton.Text = fruit
+        FruitButton.Size = UDim2.new(1, -10, 0, 30)
+        FruitButton.Position = UDim2.new(0, 5, 0, 0)
+        FruitButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        FruitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        FruitButton.Font = Enum.Font.Gotham
+        FruitButton.TextSize = 14
+        FruitButton.Parent = ScrollFrame
+        
+        FruitButton.MouseButton1Click:Connect(function()
+            -- Simulate picking the fruit
+            game:GetService("ReplicatedStorage").Remotes.Store:InvokeServer("PurchaseRawFruit", fruit)
+            
+            -- Notification
+            local Notification = Instance.new("TextLabel")
+            Notification.Name = "Notification"
+            Notification.Text = "Picked: "..fruit
+            Notification.Size = UDim2.new(0, 200, 0, 40)
+            Notification.Position = UDim2.new(0.5, -100, 1, 10)
+            Notification.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Notification.Font = Enum.Font.GothamBold
+            Notification.TextSize = 14
+            Notification.Parent = MainFrame
+            
+            wait(2)
+            Notification:Destroy()
+        end)
     end
-
-    -- Create the fruit tool
-    local tool = Instance.new("Tool")
-    tool.Name = fruitName
-    tool.Parent = player.Backpack
     
-    -- Create the fruit script (simplified version)
-    local script = Instance.new("Script")
-    script.Name = "FruitScript"
-    script.Source = [[
-        -- Simplified fruit script
-        local tool = script.Parent
-        local player = game:GetService("Players").LocalPlayer
-        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-        
-        tool.Activated:Connect(function()
-            print("Using ]] .. fruitName .. [[ fruit!")
-            -- Add actual fruit effects here
-        end)
-        
-        tool.Equipped:Connect(function()
-            -- Equip effects would go here
-        end)
-        
-        tool.Unequipped:Connect(function()
-            -- Unequip effects would go here
-        end)
-    ]]
-    script.Parent = tool
-    
-    -- Create handle (visual part)
-    local handle = Instance.new("Part")
-    handle.Name = "Handle"
-    handle.Size = Vector3.new(1, 1, 1)
-    handle.Transparency = 0.5
-    handle.Color = getRarityColor(allFruits[fruitId].Rarity)
-    handle.Material = Enum.Material.Neon
-    handle.Parent = tool
-    
-    -- Notification
-    local notification = Instance.new("ScreenGui")
-    notification.Name = "FruitNotification"
-    notification.Parent = player.PlayerGui
-    
-    local notifFrame = Instance.new("Frame")
-    notifFrame.Size = UDim2.new(0, 200, 0, 50)
-    notifFrame.Position = UDim2.new(0.5, -100, 0.8, 0)
-    notifFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    notifFrame.Parent = notification
-    
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.Text = "Received: " .. fruitName
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 16
-    label.Parent = notifFrame
-    
-    -- Remove notification after 3 seconds
-    game:GetService("Debris"):AddItem(notification, 3)
+    -- Update canvas size
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, #filteredFruits * 35)
 end
 
--- Search functionality
-searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    createFruitButtons(searchBox.Text)
-end)
-
--- Close button
-closeButton.MouseButton1Click:Connect(function()
-    gui:Destroy()
-end)
-
--- Initialize the fruit buttons
+-- Initial creation of buttons
 createFruitButtons()
+
+-- Update buttons when search text changes
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    createFruitButtons()
+end)
