@@ -1,13 +1,13 @@
--- Create the main GUI
+-- Blox Fruits Spawner with Real Fruits
 local player = game:GetService("Players").LocalPlayer
 local gui = Instance.new("ScreenGui")
-gui.Name = "VisualFruitSpawner"
+gui.Name = "RealFruitSpawner"
 gui.Parent = player:WaitForChild("PlayerGui")
 
--- Create the main frame
+-- Main frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 200)
-frame.Position = UDim2.new(0.5, -175, 0.5, -100)
+frame.Size = UDim2.new(0, 350, 0, 400)
+frame.Position = UDim2.new(0.5, -175, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
 frame.Active = true
@@ -20,32 +20,30 @@ title.Size = UDim2.new(1, 0, 0, 30)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 title.TextColor3 = Color3.new(1, 1, 1)
-title.Text = "Visual Fruit Spawner (All Fruits)"
+title.Text = "Blox Fruits Spawner"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.Parent = frame
 
--- Text box with dropdown suggestion
-local textBox = Instance.new("TextBox")
-textBox.Size = UDim2.new(0.9, 0, 0, 30)
-textBox.Position = UDim2.new(0.05, 0, 0.25, 0)
-textBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-textBox.TextColor3 = Color3.new(1, 1, 1)
-textBox.PlaceholderText = "Enter fruit name (e.g., Dragon, Kitsune, Leopard)"
-textBox.Font = Enum.Font.Gotham
-textBox.TextSize = 14
-textBox.Parent = frame
+-- Search box
+local searchBox = Instance.new("TextBox")
+searchBox.Size = UDim2.new(0.9, 0, 0, 30)
+searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
+searchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+searchBox.TextColor3 = Color3.new(1, 1, 1)
+searchBox.PlaceholderText = "Search fruits..."
+searchBox.Font = Enum.Font.Gotham
+searchBox.TextSize = 14
+searchBox.Parent = frame
 
--- Button
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(0.6, 0, 0, 40)
-button.Position = UDim2.new(0.2, 0, 0.55, 0)
-button.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-button.TextColor3 = Color3.new(1, 1, 1)
-button.Text = "Spawn Visual Fruit"
-button.Font = Enum.Font.GothamBold
-button.TextSize = 16
-button.Parent = frame
+-- Scrolling frame for fruits list
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(0.9, 0, 0, 250)
+scrollFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 5
+scrollFrame.Parent = frame
 
 -- Close button
 local closeButton = Instance.new("TextButton")
@@ -58,230 +56,189 @@ closeButton.Font = Enum.Font.GothamBold
 closeButton.TextSize = 14
 closeButton.Parent = frame
 
--- List of all Blox Fruits with their colors
-local fruitData = {
-    -- Regular Fruits
-    ["Bomb"] = Color3.fromRGB(255, 100, 100),
-    ["Spike"] = Color3.fromRGB(200, 200, 200),
-    ["Chop"] = Color3.fromRGB(255, 200, 150),
-    ["Spring"] = Color3.fromRGB(255, 255, 100),
-    ["Kilo"] = Color3.fromRGB(150, 150, 150),
-    ["Smoke"] = Color3.fromRGB(100, 100, 100),
-    ["Spin"] = Color3.fromRGB(200, 150, 255),
-    ["Flame"] = Color3.fromRGB(255, 50, 50),
-    ["Falcon"] = Color3.fromRGB(255, 200, 100),
-    ["Ice"] = Color3.fromRGB(100, 200, 255),
-    ["Sand"] = Color3.fromRGB(210, 180, 140),
-    ["Dark"] = Color3.fromRGB(100, 0, 100),
-    ["Diamond"] = Color3.fromRGB(100, 200, 255),
-    ["Light"] = Color3.fromRGB(255, 255, 150),
-    ["Rubber"] = Color3.fromRGB(150, 0, 0),
-    ["Barrier"] = Color3.fromRGB(200, 200, 255),
-    ["Ghost"] = Color3.fromRGB(150, 150, 255),
-    ["Magma"] = Color3.fromRGB(255, 80, 0),
-    ["Quake"] = Color3.fromRGB(150, 0, 150),
-    ["Buddha"] = Color3.fromRGB(255, 215, 0),
-    ["Love"] = Color3.fromRGB(255, 100, 150),
-    ["Spider"] = Color3.fromRGB(100, 0, 0),
-    ["Sound"] = Color3.fromRGB(200, 100, 255),
-    ["Phoenix"] = Color3.fromRGB(255, 100, 0),
-    ["Portal"] = Color3.fromRGB(150, 0, 255),
-    ["Rumble"] = Color3.fromRGB(255, 150, 0),
-    ["Paw"] = Color3.fromRGB(255, 150, 200),
-    ["Gravity"] = Color3.fromRGB(100, 0, 200),
-    ["Dough"] = Color3.fromRGB(255, 220, 150),
-    ["Shadow"] = Color3.fromRGB(50, 0, 100),
-    ["Venom"] = Color3.fromRGB(0, 150, 0),
-    ["Control"] = Color3.fromRGB(255, 0, 0),
-    ["Spirit"] = Color3.fromRGB(255, 100, 255),
-    ["Dragon"] = Color3.fromRGB(255, 100, 0),
-    ["Leopard"] = Color3.fromRGB(255, 200, 50),
-    ["Kitsune"] = Color3.fromRGB(255, 150, 150),
-    ["Mammoth"] = Color3.fromRGB(150, 100, 50),
-    ["T-Rex"] = Color3.fromRGB(150, 50, 0),
-    ["Dough Awakened"] = Color3.fromRGB(255, 240, 180),
-    ["Shadow Awakened"] = Color3.fromRGB(100, 0, 150),
-    ["Venom Awakened"] = Color3.fromRGB(0, 200, 0),
-    ["Control Awakened"] = Color3.fromRGB(255, 50, 50),
-    ["Spirit Awakened"] = Color3.fromRGB(255, 150, 255),
-    ["Dragon Awakened"] = Color3.fromRGB(255, 150, 0),
-    
-    -- Dragon Variants
-    ["Dragon Red"] = Color3.fromRGB(255, 50, 50),
-    ["Dragon Blue"] = Color3.fromRGB(50, 50, 255),
-    ["Dragon Green"] = Color3.fromRGB(50, 255, 50),
-    ["Dragon West"] = Color3.fromRGB(255, 100, 0),
-    ["Dragon East"] = Color3.fromRGB(0, 100, 255),
-    
-    -- Special Variants
-    ["Yeti"] = Color3.fromRGB(200, 230, 255),
-    ["Cyborg"] = Color3.fromRGB(200, 200, 200),
-    ["Human"] = Color3.fromRGB(255, 200, 150),
-    ["Fishman"] = Color3.fromRGB(0, 150, 200),
-    ["Ghoul"] = Color3.fromRGB(100, 0, 0),
-    ["Angel"] = Color3.fromRGB(255, 255, 255),
-    ["Shark"] = Color3.fromRGB(0, 100, 150),
-    ["Rabbit"] = Color3.fromRGB(255, 200, 200),
-    ["Swan"] = Color3.fromRGB(255, 255, 255),
-    ["Phoenix Awakened"] = Color3.fromRGB(255, 150, 0),
+-- List of all fruits with their IDs (simplified for example)
+local allFruits = {
+    {Name = "Bomb", ID = 1, Rarity = "Common"},
+    {Name = "Spike", ID = 2, Rarity = "Common"},
+    {Name = "Chop", ID = 3, Rarity = "Common"},
+    {Name = "Spring", ID = 4, Rarity = "Common"},
+    {Name = "Flame", ID = 5, Rarity = "Uncommon"},
+    {Name = "Ice", ID = 6, Rarity = "Uncommon"},
+    {Name = "Sand", ID = 7, Rarity = "Uncommon"},
+    {Name = "Dark", ID = 8, Rarity = "Uncommon"},
+    {Name = "Diamond", ID = 9, Rarity = "Uncommon"},
+    {Name = "Light", ID = 10, Rarity = "Rare"},
+    {Name = "Rubber", ID = 11, Rarity = "Rare"},
+    {Name = "Barrier", ID = 12, Rarity = "Rare"},
+    {Name = "Magma", ID = 13, Rarity = "Rare"},
+    {Name = "Quake", ID = 14, Rarity = "Legendary"},
+    {Name = "Buddha", ID = 15, Rarity = "Legendary"},
+    {Name = "Love", ID = 16, Rarity = "Legendary"},
+    {Name = "Spider", ID = 17, Rarity = "Legendary"},
+    {Name = "Sound", ID = 18, Rarity = "Legendary"},
+    {Name = "Phoenix", ID = 19, Rarity = "Mythical"},
+    {Name = "Portal", ID = 20, Rarity = "Mythical"},
+    {Name = "Rumble", ID = 21, Rarity = "Mythical"},
+    {Name = "Paw", ID = 22, Rarity = "Mythical"},
+    {Name = "Gravity", ID = 23, Rarity = "Mythical"},
+    {Name = "Dough", ID = 24, Rarity = "Mythical"},
+    {Name = "Shadow", ID = 25, Rarity = "Mythical"},
+    {Name = "Venom", ID = 26, Rarity = "Mythical"},
+    {Name = "Control", ID = 27, Rarity = "Mythical"},
+    {Name = "Spirit", ID = 28, Rarity = "Mythical"},
+    {Name = "Dragon", ID = 29, Rarity = "Mythical"},
+    {Name = "Leopard", ID = 30, Rarity = "Mythical"},
+    {Name = "Kitsune", ID = 31, Rarity = "Mythical"},
+    {Name = "Mammoth", ID = 32, Rarity = "Mythical"},
+    {Name = "T-Rex", ID = 33, Rarity = "Mythical"},
+    {Name = "Dough Awakened", ID = 34, Rarity = "Mythical"},
+    {Name = "Shadow Awakened", ID = 35, Rarity = "Mythical"},
+    {Name = "Venom Awakened", ID = 36, Rarity = "Mythical"},
+    {Name = "Control Awakened", ID = 37, Rarity = "Mythical"},
+    {Name = "Spirit Awakened", ID = 38, Rarity = "Mythical"},
+    {Name = "Dragon Awakened", ID = 39, Rarity = "Mythical"},
+    {Name = "Dragon Red", ID = 40, Rarity = "Mythical"},
+    {Name = "Dragon Blue", ID = 41, Rarity = "Mythical"},
+    {Name = "Dragon Green", ID = 42, Rarity = "Mythical"},
+    {Name = "Dragon West", ID = 43, Rarity = "Mythical"},
+    {Name = "Dragon East", ID = 44, Rarity = "Mythical"},
 }
 
--- Function to find closest matching fruit name
-local function findClosestFruit(input)
-    input = string.lower(input)
-    local bestMatch = nil
-    local bestScore = 0
-    
-    for fruitName, _ in pairs(fruitData) do
-        local lowerFruit = string.lower(fruitName)
-        local score = 0
-        
-        -- Exact match
-        if lowerFruit == input then
-            return fruitName
+-- Function to create fruit buttons
+local function createFruitButtons(filter)
+    -- Clear existing buttons
+    for _, child in ipairs(scrollFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
         end
-        
-        -- Partial match
-        if string.find(lowerFruit, input) then
-            score = string.len(input) / string.len(lowerFruit)
-        end
-        
-        if score > bestScore then
-            bestScore = score
-            bestMatch = fruitName
+    end
+
+    -- Create new buttons based on filter
+    local yOffset = 5
+    for _, fruit in ipairs(allFruits) do
+        if not filter or string.find(string.lower(fruit.Name), string.lower(filter)) then
+            local button = Instance.new("TextButton")
+            button.Size = UDim2.new(0.95, 0, 0, 30)
+            button.Position = UDim2.new(0.025, 0, 0, yOffset)
+            button.BackgroundColor3 = getRarityColor(fruit.Rarity)
+            button.TextColor3 = Color3.new(1, 1, 1)
+            button.Text = fruit.Name
+            button.Font = Enum.Font.Gotham
+            button.TextSize = 14
+            button.Parent = scrollFrame
+            
+            button.MouseButton1Click:Connect(function()
+                giveFruitToPlayer(fruit.ID, fruit.Name)
+            end)
+            
+            yOffset = yOffset + 35
         end
     end
     
-    return bestMatch
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
 end
 
--- Function to spawn visual fruit
-local function spawnVisualFruit(fruitName)
-    -- Find the closest matching fruit
-    local matchedFruit = findClosestFruit(fruitName)
-    if not matchedFruit then
-        textBox.Text = ""
-        textBox.PlaceholderText = "Fruit not found! Try another name"
+-- Function to get color based on rarity
+local function getRarityColor(rarity)
+    if rarity == "Common" then
+        return Color3.fromRGB(150, 150, 150)
+    elseif rarity == "Uncommon" then
+        return Color3.fromRGB(50, 200, 50)
+    elseif rarity == "Rare" then
+        return Color3.fromRGB(50, 150, 255)
+    elseif rarity == "Legendary" then
+        return Color3.fromRGB(200, 50, 255)
+    elseif rarity == "Mythical" then
+        return Color3.fromRGB(255, 150, 50)
+    else
+        return Color3.fromRGB(100, 100, 100)
+    end
+end
+
+-- Function to give fruit to player
+local function giveFruitToPlayer(fruitId, fruitName)
+    -- Check if player has a backpack
+    if not player:FindFirstChild("Backpack") then
+        warn("Player backpack not found!")
         return
     end
-    
-    -- Clear any existing visual fruit
-    if player.Character then
-        for _, child in pairs(player.Character:GetChildren()) do
-            if child.Name == "VisualFruit" then
-                child:Destroy()
-            end
-        end
-    end
 
-    -- Create a new part to represent the fruit
-    local fruit = Instance.new("Part")
-    fruit.Name = "VisualFruit"
-    fruit.Anchored = true
-    fruit.CanCollide = false
-    fruit.Size = Vector3.new(3, 3, 3)
-    fruit.Transparency = 0.2
-    fruit.Material = Enum.Material.Neon
-    fruit.Color = fruitData[matchedFruit]
+    -- Create the fruit tool
+    local tool = Instance.new("Tool")
+    tool.Name = fruitName
+    tool.Parent = player.Backpack
     
-    -- Special handling for certain fruits
-    if string.find(matchedFruit, "Dragon") then
-        fruit.Size = Vector3.new(5, 3, 8)
-        fruit.Material = Enum.Material.Slate
-    elseif string.find(matchedFruit, "Kitsune") then
-        fruit.Color = Color3.fromRGB(255, 150, 150)
-        fruit.Material = Enum.Material.Glass
-        fruit.Transparency = 0.5
-    elseif string.find(matchedFruit, "Yeti") then
-        fruit.Color = Color3.fromRGB(200, 230, 255)
-        fruit.Material = Enum.Material.Ice
-    end
+    -- Create the fruit script (simplified version)
+    local script = Instance.new("Script")
+    script.Name = "FruitScript"
+    script.Source = [[
+        -- Simplified fruit script
+        local tool = script.Parent
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        
+        tool.Activated:Connect(function()
+            print("Using ]] .. fruitName .. [[ fruit!")
+            -- Actual game would have more complex logic here
+        end)
+        
+        tool.Equipped:Connect(function()
+            -- Equip effects would go here
+        end)
+        
+        tool.Unequipped:Connect(function()
+            -- Unequip effects would go here
+        end)
+    ]]
+    script.Parent = tool
     
-    -- Position in front of the player
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = player.Character.HumanoidRootPart
-        fruit.CFrame = hrp.CFrame + hrp.CFrame.LookVector * 5
-    else
-        fruit.CFrame = CFrame.new(0, 5, 0)
-    end
+    -- Create handle (visual part)
+    local handle = Instance.new("Part")
+    handle.Name = "Handle"
+    handle.Size = Vector3.new(1, 1, 1)
+    handle.Transparency = 0.5
+    handle.Color = getRarityColor(allFruits[fruitId].Rarity)
+    handle.Material = Enum.Material.Neon
+    handle.Parent = tool
     
-    -- Add a label
-    local billboard = Instance.new("BillboardGui")
-    billboard.Size = UDim2.new(0, 200, 0, 50)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
-    billboard.Adornee = fruit
-    billboard.Parent = fruit
+    -- Add fruit model (simplified)
+    local model = Instance.new("Model")
+    model.Name = fruitName .. "Model"
+    model.Parent = tool
+    
+    -- Notification
+    local notification = Instance.new("ScreenGui")
+    notification.Name = "FruitNotification"
+    notification.Parent = player.PlayerGui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 200, 0, 50)
+    frame.Position = UDim2.new(0.5, -100, 0.8, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.Parent = notification
     
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
-    label.Text = matchedFruit .. " (Visual)"
-    label.TextColor3 = fruit.Color
+    label.Text = "Received: " .. fruitName
+    label.TextColor3 = Color3.new(1, 1, 1)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 16
-    label.Parent = billboard
+    label.Parent = frame
     
-    -- Make it only visible to the local player
-    fruit.Parent = workspace
-    fruit:SetNetworkOwner(nil) -- Makes it not replicate to other players
-    
-    -- Special effects for certain fruits
-    if string.find(matchedFruit, "Flame") or string.find(matchedFruit, "Magma") or string.find(matchedFruit, "Phoenix") then
-        local fire = Instance.new("Fire")
-        fire.Heat = 5
-        fire.Size = 10
-        fire.Parent = fruit
-    elseif string.find(matchedFruit, "Ice") or string.find(matchedFruit, "Yeti") then
-        local particle = Instance.new("ParticleEmitter")
-        particle.Texture = "rbxassetid://242295788"
-        particle.LightEmission = 1
-        particle.Size = NumberSequence.new(0.5)
-        particle.Lifetime = NumberRange.new(1)
-        particle.Speed = NumberRange.new(2)
-        particle.Parent = fruit
-    end
-    
-    -- Destroy after 60 seconds
-    game:GetService("Debris"):AddItem(fruit, 60)
+    -- Remove notification after 3 seconds
+    game:GetService("Debris"):AddItem(notification, 3)
 end
 
--- Button click event
-button.MouseButton1Click:Connect(function()
-    local fruitName = textBox.Text
-    if fruitName and string.len(fruitName) > 0 then
-        spawnVisualFruit(fruitName)
-    else
-        textBox.PlaceholderText = "Please enter a fruit name!"
-    end
+-- Search functionality
+searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    createFruitButtons(searchBox.Text)
 end)
 
--- Close button event
+-- Close button
 closeButton.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- Auto-complete suggestion
-local suggestion = Instance.new("TextLabel")
-suggestion.Size = UDim2.new(0.9, 0, 0, 20)
-suggestion.Position = UDim2.new(0.05, 0, 0.45, 0)
-suggestion.BackgroundTransparency = 1
-suggestion.TextColor3 = Color3.fromRGB(150, 150, 150)
-suggestion.Font = Enum.Font.Gotham
-suggestion.TextSize = 12
-suggestion.TextXAlignment = Enum.TextXAlignment.Left
-suggestion.Parent = frame
-suggestion.Visible = false
-
-textBox:GetPropertyChangedSignal("Text"):Connect(function()
-    if string.len(textBox.Text) > 0 then
-        local matched = findClosestFruit(textBox.Text)
-        if matched then
-            suggestion.Text = "Suggestion: " .. matched
-            suggestion.Visible = true
-        else
-            suggestion.Visible = false
-        end
-    else
-        suggestion.Visible = false
-    end
-end)
+-- Initial creation of buttons
+createFruitButtons()
