@@ -1,20 +1,38 @@
--- Blox Fruits Devil Fruit Picker GUI
--- Paste this in a LocalScript inside StarterGui or a ScreenGui
+-- Blox Fruits Devil Fruit Picker for Executors
+-- Paste this into your executor
+
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
-local Mouse = Player:GetMouse()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Create the main GUI
+-- Wait for the player to be loaded
+repeat wait() until Player.Character
+
+-- List of all devil fruits (updated for Blox Fruits)
+local devilFruits = {
+    "Bomb", "Spike", "Chop", "Spring", "Rocket", "Spin", "Bird: Falcon", 
+    "Smoke", "Flame", "Ice", "Sand", "Dark", "Diamond", "Light", 
+    "Rubber", "Barrier", "Ghost", "Magma", "Quake", "Buddha", 
+    "Love", "Spider", "Sound", "Phoenix", "Portal", "Rumble", 
+    "Pain", "Blizzard", "Gravity", "Mammoth", "Dough", "Shadow", 
+    "Venom", "Control", "Spirit", "Dragon West", "Dragon East", 
+    "Leopard", "Kitsune"
+}
+
+-- Create the GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DevilFruitPicker"
-ScreenGui.Parent = Player.PlayerGui
+ScreenGui.Name = "FruitPicker"
+ScreenGui.Parent = game:GetService("CoreGui") or Player:WaitForChild("PlayerGui")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 300, 0, 400)
 MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
@@ -24,7 +42,7 @@ Title.Name = "Title"
 Title.Text = "Devil Fruit Picker"
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.Position = UDim2.new(0, 0, 0, 0)
-Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
@@ -50,7 +68,7 @@ SearchBox.Name = "SearchBox"
 SearchBox.PlaceholderText = "Search fruits..."
 SearchBox.Size = UDim2.new(1, -20, 0, 30)
 SearchBox.Position = UDim2.new(0, 10, 0, 35)
-SearchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SearchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 SearchBox.Font = Enum.Font.Gotham
 SearchBox.TextSize = 14
@@ -69,76 +87,114 @@ local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Padding = UDim.new(0, 5)
 UIListLayout.Parent = ScrollFrame
 
--- List of all Blox Fruits devil fruits (including variants like Dragon West/East)
-local devilFruits = {
-    "Bomb", "Spike", "Chop", "Spring", "Rocket", "Spin", "Bird: Falcon", "Smoke", "Flame", 
-    "Ice", "Sand", "Dark", "Diamond", "Light", "Rubber", "Barrier", "Ghost", "Magma", 
-    "Quake", "Buddha", "Love", "Spider", "Sound", "Phoenix", "Portal", "Rumble", "Pain", 
-    "Blizzard", "Gravity", "Mammoth", "Dough", "Shadow", "Venom", "Control", "Spirit",
-    "Dragon West", "Dragon East", "Leopard", "Kitsune"
-}
+-- Function to pick a fruit
+local function pickFruit(fruitName)
+    -- Try different remote events that Blox Fruits might use
+    local remotes = {
+        ReplicatedStorage:FindFirstChild("Remotes"),
+        ReplicatedStorage:FindFirstChild("Functions"),
+        ReplicatedStorage:FindFirstChild("Events")
+    }
+    
+    for _, remoteFolder in ipairs(remotes) do
+        if remoteFolder then
+            local purchaseRemote = remoteFolder:FindFirstChild("PurchaseRawFruit") or 
+                                  remoteFolder:FindFirstChild("StoreFruit") or
+                                  remoteFolder:FindFirstChild("BuyFruit")
+            
+            if purchaseRemote then
+                if purchaseRemote:IsA("RemoteEvent") then
+                    purchaseRemote:FireServer(fruitName)
+                elseif purchaseRemote:IsA("RemoteFunction") then
+                    purchaseRemote:InvokeServer(fruitName)
+                end
+                return true
+            end
+        end
+    end
+    
+    -- Fallback method (might work in some games)
+    pcall(function()
+        ReplicatedStorage.Remotes.Store:InvokeServer("PurchaseRawFruit", fruitName)
+    end)
+    
+    return false
+end
 
--- Create buttons for each fruit
+-- Create fruit buttons
 local function createFruitButtons()
     -- Clear existing buttons
     for _, child in ipairs(ScrollFrame:GetChildren()) do
-        if child:IsA("TextButton") then
+        if child:IsA("TextButton") or child:IsA("TextLabel") then
             child:Destroy()
         end
     end
     
-    -- Filter fruits based on search
     local searchText = string.lower(SearchBox.Text)
     local filteredFruits = {}
     
     for _, fruit in ipairs(devilFruits) do
-        if string.find(string.lower(fruit), searchText, 1, true) then
+        if searchText == "" or string.find(string.lower(fruit), searchText, 1, true) then
             table.insert(filteredFruits, fruit)
         end
     end
     
-    -- Create buttons for filtered fruits
-    for _, fruit in ipairs(filteredFruits) do
-        local FruitButton = Instance.new("TextButton")
-        FruitButton.Name = fruit
-        FruitButton.Text = fruit
-        FruitButton.Size = UDim2.new(1, -10, 0, 30)
-        FruitButton.Position = UDim2.new(0, 5, 0, 0)
-        FruitButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-        FruitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        FruitButton.Font = Enum.Font.Gotham
-        FruitButton.TextSize = 14
-        FruitButton.Parent = ScrollFrame
-        
-        FruitButton.MouseButton1Click:Connect(function()
-            -- Simulate picking the fruit
-            game:GetService("ReplicatedStorage").Remotes.Store:InvokeServer("PurchaseRawFruit", fruit)
+    if #filteredFruits == 0 then
+        local noResults = Instance.new("TextLabel")
+        noResults.Text = "No fruits found"
+        noResults.Size = UDim2.new(1, 0, 0, 30)
+        noResults.TextColor3 = Color3.new(1, 1, 1)
+        noResults.BackgroundTransparency = 1
+        noResults.Parent = ScrollFrame
+    else
+        for _, fruit in ipairs(filteredFruits) do
+            local button = Instance.new("TextButton")
+            button.Text = fruit
+            button.Size = UDim2.new(1, -10, 0, 30)
+            button.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            button.TextColor3 = Color3.new(1, 1, 1)
+            button.Font = Enum.Font.Gotham
+            button.TextSize = 14
+            button.Parent = ScrollFrame
             
-            -- Notification
-            local Notification = Instance.new("TextLabel")
-            Notification.Name = "Notification"
-            Notification.Text = "Picked: "..fruit
-            Notification.Size = UDim2.new(0, 200, 0, 40)
-            Notification.Position = UDim2.new(0.5, -100, 1, 10)
-            Notification.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            Notification.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Notification.Font = Enum.Font.GothamBold
-            Notification.TextSize = 14
-            Notification.Parent = MainFrame
-            
-            wait(2)
-            Notification:Destroy()
-        end)
+            button.MouseButton1Click:Connect(function()
+                local success = pickFruit(fruit)
+                if success then
+                    local notif = Instance.new("TextLabel")
+                    notif.Text = "Equipped: "..fruit
+                    notif.Size = UDim2.new(0, 200, 0, 40)
+                    notif.Position = UDim2.new(0.5, -100, 1, 10)
+                    notif.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+                    notif.TextColor3 = Color3.new(1, 1, 1)
+                    notif.Font = Enum.Font.GothamBold
+                    notif.TextSize = 14
+                    notif.Parent = MainFrame
+                    
+                    delay(2, function()
+                        notif:Destroy()
+                    end)
+                else
+                    warn("Failed to equip fruit: "..fruit)
+                end
+            end)
+        end
     end
     
-    -- Update canvas size
     ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, #filteredFruits * 35)
 end
 
--- Initial creation of buttons
+-- Initial creation
 createFruitButtons()
 
--- Update buttons when search text changes
-SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    createFruitButtons()
+-- Update on search
+SearchBox:GetPropertyChangedSignal("Text"):Connect(createFruitButtons)
+
+-- Keybind to toggle GUI (F5)
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.F5 then
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end
 end)
+
+print("Devil Fruit Picker loaded! Press F5 to toggle visibility.")
